@@ -38,9 +38,7 @@
                 header("Location: " .$_SERVER['HTTP_REFERER']);
             }  
         }
-
-        // Загрузка
-
+        
         function fuckimg($src, $width, $height){
             global $_FILES, $error;
 
@@ -94,8 +92,6 @@
                 imagedestroy($size);
             }
         }
-
-        // Конец этого
 
         if($_FILES['file']['error'] == 0){
             unlink(fuckimg($_FILES['file']['tmp_name'], 0, 50));
