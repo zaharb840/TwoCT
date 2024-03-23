@@ -3,6 +3,6 @@
         'server' => 'localhost',
         'user' => 'root',
         'pass' => '',
-        'db' => 'onect'
+        'db' => 'twoct'
     );
 ?>

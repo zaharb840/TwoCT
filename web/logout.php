@@ -1,8 +1,11 @@
 <?php
-	require_once "../include/config.php";
 
-	unset($_SESSION['user']);
+require_once "../include/config.php";
 
-	header("Location: $url");
+session_unset();
 
-	mysqli_close($db);
+header("Location: {$config['url']}");
+
+mysqli_close($db);
+
+?>

@@ -1,21 +1,45 @@
-<?php 
-    require_once '../include/config.php';
+<?php
 
-    if(!isset($_SESSION['user'])){
-        header("Location: login.php");
-    }
+/**
+ * This file is part of TwoConnect project.
+ *
+ * @file ban.php
+ * @author KovshKomeij (https://github.com/KovshKomeij) and Zahar Ivanov (https://github.com/zaharb840)
+ * @license BSD License
+ *
+ * @copyright 2024 KovshKomeji and Zahar Ivanov
+ */
 
-    $data = mysqli_fetch_assoc(mysqli_query($db, 'SELECT * FROM users WHERE id = ' .$_SESSION['user']['user_id']));
+/**
+ * This script handles the display of a banned user account.
+ * It checks if the user is banned and displays the reason for the ban,
+ * or a generic message if no reason is given.
+ * If the user is not banned, it redirects them to the index page.
+ */
 
-    if($data['ban'] != 1){
-        $_SESSION['user']['ban'] = 0;
-        header("Location: index.php");
-    }
+require_once '../include/config.php';
 
-    $bandata = mysqli_fetch_assoc(mysqli_query($db, 'SELECT * FROM banlist WHERE user_id = ' .$_SESSION['user']['user_id']));
+session_start();
+
+if (!isset($_SESSION['user'])) {
+    header('Location: login.php');
+    exit();
+}
+
+$userId = $_SESSION['user']['id'];
+$user = mysqli_fetch_assoc(mysqli_query($db, "SELECT ban FROM users WHERE id = $userId"));
+
+if ($user['ban'] != 1) {
+    $_SESSION['user']['ban'] = 0;
+    header('Location: index.php');
+    exit();
+}
+
+$banData = mysqli_fetch_assoc(mysqli_query($db, "SELECT reason FROM banlist WHERE user_id = $userId"));
 
 ?>
 
+<!DOCTYPE html>
 <html>
 <head>
     <?php include '../include/html/head.php'; ?>
@@ -24,17 +48,17 @@
 <body>
     <div class="main_app">
         <div class="main">
-            <h1>Вы были забанены в <?php echo($sitename); ?></h1>
-
-            <?php if(!empty($bandata['reason'])): ?>
-                <h3>По причине: <?php echo($bandata['reason']); ?></h3>
+            <h1>Вы были забанены в <?php echo $sitename; ?></h1>
+            <?php if (!empty($banData['reason'])): ?>
+                <h3>По причине: <?php echo $banData['reason']; ?></h3>
             <?php else: ?>
                 <h3>По не указанной причине</h3>
             <?php endif; ?>
-
             <h3>На всегда</h3>
         </div>
     </div>
 </body>
 </html>
-<?php mysqli_close($db);
+<?php
+mysqli_close($db);
+?>

@@ -1,16 +1,29 @@
 <?php
-	require_once "../include/config.php";
-?>
+/**
+ * This file is part of TwoConnect project.
+ *
+ * @file authors.php
+ * @author KovshKomeij (https://github.com/KovshKomeij) and Zahar Ivanov (https://github.com/zaharb840)
+ * @license BSD License
+ *
+ * @copyright 2024 KovshKomeji and Zahar Ivanov
+ */
 
+require_once "../include/config.php";
+
+// Start HTML document
+?>
 <html>
 <head>
 	<?php include '../include/html/head.php'; ?>
+    <!-- Set page title -->
     <title><?php echo($lang_authors); ?></title>
 </head>
 <body>
 	<?php include '../include/html/header.php'; ?>
 	<div class="main_app">
 		<div class="main">
+            <!-- Author 1 section -->
             <h2><?php echo($lang_authors1); ?></h2>
 			<table class="user">
 				<tr>
@@ -23,10 +36,13 @@
 				</tr>
 			</table>
 
+            <!-- Author 2 section -->
             <h2><?php echo($lang_authors2); ?></h2>
 
+            <!-- Fetch all author users from database -->
             <?php $allUsers = mysqli_query($db, 'SELECT id, name, priv, img200 FROM users WHERE priv > 1'); ?>
 				
+			<!-- Loop through each author user -->
 			<?php while($list = mysqli_fetch_assoc($allUsers)): ?>
 				<table class="user">
 					<tr>
@@ -39,8 +55,10 @@
 							<a href="user.php?id=<?php echo($list['id']); ?>">
 								<h1>
 									<?php
+										// Display author name
 										echo(strip_tags($list['name']).' ');
 
+										// Display verification badge if author is verified
 										if ($list['priv'] >= 1){ 
 											echo('<img src="../imgs/verif.gif">');
 										}
@@ -52,6 +70,7 @@
 				</table>
 			<?php endwhile; ?>
 
+            <!-- Author 3 section -->
             <h2><?php echo($lang_authors3); ?></h2>
 		</div>
 	</div>

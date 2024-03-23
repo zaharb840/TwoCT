@@ -1,57 +1,102 @@
 <?php
-	require_once "../include/config.php";
 
-	if(isset($_SESSION['user'])){
-		header("Location: $url");
-	}
+/**
+ * This file is part of TwoConnect project.
+ *
+ * @file register.php
+ * @author KovshKomeij (https://github.com/KovshKomeij) and Zahar Ivanov (https://github.com/zaharb840)
+ * @license BSD License
+ *
+ * @copyright 2024 KovshKomeji and Zahar Ivanov
+ */
 
-	$checkemail = 'SELECT email FROM users WHERE email = "' .$_POST['email']. '"';
-	$checkip = 'SELECT ip FROM users WHERE ip = "' .$_SERVER['REMOTE_ADDR']. '"';
-	$createacc = 'INSERT INTO users(name, email, pass, ip, descr) VALUES (
-		"' .mysqli_real_escape_string($db, $_POST['username']). '", 
-		"' .mysqli_real_escape_string($db, $_POST['email']). '", 
-		"' .password_hash($_POST['pass'], PASSWORD_DEFAULT). '", 
-		"' .$_SERVER['REMOTE_ADDR']. '", 
-		"' .mysqli_real_escape_string($db, $_POST['descr']). '"
-	)';
-							
-	if(isset($_POST['do_signup'])){
-		if(empty(trim($_POST['username']))){
-			$text = 'Введите свой ник!';
-		}
-						
-		if(empty(trim($_POST['email']))){
-			$text = 'Введите свою email почту!';
-		}
-						
-		if(empty(trim($_POST['pass']))){
-			$text = 'Введите свой пароль!';
-		}	
-						
-		if($_POST['pass2'] != $_POST['pass'] ){
-			$text = 'Повторный пароль введён неверно!';
-		}
+/*
+ * This file handles the registration process.
+ * It requires the config.php file for database connection.
+ */
 
-		if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)){
-			$text = 'email почта не является email почтой';
-		}
-						
-		if((mysqli_num_rows(mysqli_query($db, $checkemail))) != 0){
-			$text = 'Email почта занятя!';
-		}	
+require_once "../include/config.php";
 
-		if(mysqli_num_rows(mysqli_query($db, $checkip)) != 0){
-			$text = 'Вы уже зарегистрированы!';
-		}
+/**
+ * Redirects to the homepage if user is already logged in.
+ */
+if(isset($_SESSION['user'])) {
+    header("Location: $url");
+}
 
-		if(empty(trim($text))){
-			if(mysqli_query($db, $createacc)){
-				$text = 'Вы успешно зарегистрированы';;
-			} else {
-				$text = 'Ошибка сервера';
-			}
-		}
-	}
+/**
+ * Query to check if email already exists in the database.
+ * @var string $checkemail
+ */
+$checkemail = 'SELECT email FROM users WHERE email = "' .$_POST['email']. '"';
+
+/**
+ * Query to check if user already exists in the database.
+ * @var string $checkip
+ */
+$checkip = 'SELECT ip FROM users WHERE ip = "' .$_SERVER['REMOTE_ADDR']. '"';
+
+/**
+ * Query to create a new user in the database.
+ * @var string $createacc
+ */
+$createacc = 'INSERT INTO users(name, email, pass, ip, descr) VALUES (
+    "' .mysqli_real_escape_string($db, $_POST['username']). '", 
+    "' .mysqli_real_escape_string($db, $_POST['email']). '", 
+    "' .password_hash($_POST['pass'], PASSWORD_DEFAULT). '", 
+    "' .$_SERVER['REMOTE_ADDR']. '", 
+    "' .mysqli_real_escape_string($db, $_POST['descr']). '"
+)';
+
+/**
+ * Checks if user wants to register and validates the form data.
+ */
+if(isset($_POST['do_signup'])) {
+    // Check if username is empty
+    if(empty(trim($_POST['username']))) {
+        $text = 'Введите свой ник!';
+    }
+
+    // Check if email is empty
+    if(empty(trim($_POST['email']))) {
+        $text = 'Введите свою email почту!';
+    }
+
+    // Check if password is empty
+    if(empty(trim($_POST['pass']))) {
+        $text = 'Введите свой пароль!';
+    }	
+
+    // Check if repeated password matches
+    if($_POST['pass2'] != $_POST['pass'] ) {
+        $text = 'Повторный пароль введён неверно!';
+    }
+
+    // Check if email is valid
+    if(!filter_var($_POST['email'], FILTER_VALIDATE_EMAIL)) {
+        $text = 'email почта не является email почтой';
+    }
+
+    // Check if email already exists in the database
+    if((mysqli_num_rows(mysqli_query($db, $checkemail))) != 0) {
+        $text = 'Email почта занятя!';
+    }	
+
+    // Check if user already exists in the database
+    if(mysqli_num_rows(mysqli_query($db, $checkip)) != 0) {
+        $text = 'Вы уже зарегистрированы!';
+    }
+
+    // Create new user if form data is valid
+    if(empty(trim($text))) {
+        if(mysqli_query($db, $createacc)) {
+            $text = 'Вы успешно зарегистрированы';
+        } else {
+            $text = 'Ошибка сервера';
+        }
+    }
+}
+
 ?>
 
 <html>

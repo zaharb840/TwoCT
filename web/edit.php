@@ -1,29 +1,52 @@
 <?php
-	require_once "../include/config.php";
 
-	if(empty($_SESSION['user'])){
-		header("Location: login.php");
-	}
+/** 
+ * This file is part of TwoConnect project.
+ *
+ * @file ban.php
+ * @author KovshKomeij (https://github.com/KovshKomeij) and Zahar Ivanov (https://github.com/zaharb840)
+ * @license BSD License
+ *
+ * @copyright 2024 KovshKomeji and Zahar Ivanov
+ */
 
-	$data = mysqli_fetch_assoc(mysqli_query($db, 'SELECT * FROM users WHERE id = ' .$_SESSION['user']['user_id']));
+/*
+This script is responsible for handling user settings.
+It includes the config file, checks if the user is logged in,
+fetches user data from the database, processes form submission,
+and displays the form.
+*/
 
-	$change = "UPDATE users SET 
-		name = '" .mysqli_real_escape_string($db, strip_tags($_POST['username'])). "', 
-		descr = '" .mysqli_real_escape_string($db, strip_tags($_POST['descr']))."', 
-		yespost = '" .(int)$_POST['yespost']. "'
-		WHERE id = '" .$_SESSION['user']['user_id']. "'";
+require_once "../include/config.php"; // Include config file
+
+// Check if user is logged in
+if(empty($_SESSION['user'])){
+	header("Location: login.php"); // Redirect to login page
+}
+
+// Fetch user data from the database
+$data = mysqli_fetch_assoc(mysqli_query($db, // Query to fetch user data
+	'SELECT * FROM users WHERE id = ' .$_SESSION['user']['user_id']));
+
+// Prepare SQL query to update user settings
+$change = "UPDATE users SET 
+	name = '" .mysqli_real_escape_string($db, strip_tags($_POST['username'])). "', 
+	descr = '" .mysqli_real_escape_string($db, strip_tags($_POST['descr']))."', 
+	yespost = '" .(int)$_POST['yespost']. "'
+	WHERE id = '" .$_SESSION['user']['user_id']. "'";
 	
-	if(isset($_POST['do_change'])){
-		if(empty(trim(strip_tags($_POST['username'])))){
-			$error = 'Ник пустой';
-		}
-		
-		if(empty($error)){
-			if(mysqli_query($db, $change)){
-				header("Location: $url");
-			}
+// Process form submission
+if(isset($_POST['do_change'])){ // Check if form is submitted
+	if(empty(trim(strip_tags($_POST['username'])))){ // Check if username is empty
+		$error = 'Ник пустой'; // Set error message
+	}
+	
+	if(empty($error)){ // Check if there are no errors
+		if(mysqli_query($db, $change)){ // Execute the SQL query
+			header("Location: $url"); // Redirect to the main page
 		}
 	}
+}
 ?>
 <html>
 <head>
